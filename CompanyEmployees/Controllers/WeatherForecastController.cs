@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Contracts;
 using LoggerService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,10 +15,11 @@ namespace CompanyEmployees.Controllers
 	{
 
 		private ILoggerManager _logger;
+		private IRepositoryManager _repository;
 
-		public WeatherForecastController(ILoggerManager logger)
+		public WeatherForecastController(IRepositoryManager repository)
 		{
-			this._logger = logger;
+			_repository = repository;
 		}
 
 		private static readonly string[] Summaries = new[]
