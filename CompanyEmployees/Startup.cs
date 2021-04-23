@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using NLog;
+using AutoMapper;
 
 namespace CompanyEmployees
 {
@@ -36,6 +37,7 @@ namespace CompanyEmployees
 			services.ConfigureLoggerService();
 			services.ConfigureSqlContext(Configuration);
 			services.ConfigureRepositoryManager();
+			services.AddAutoMapper(typeof(Startup));
 			services.AddControllers();
 			services.AddSwaggerGen(c =>
 			{
