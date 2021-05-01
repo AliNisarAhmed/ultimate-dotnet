@@ -8,15 +8,25 @@ namespace CompanyEmployees
 	{
 		public MappingProfile()
 		{
+			// ---- COMPANY ----
+
 			CreateMap<Company, CompanyDTO>()
 					.ForMember(c => c.FullAddress,
 							opt => opt.MapFrom(x => string.Join(' ', x.Address, x.Country)));
 
-			CreateMap<Employee, EmployeeDTO>();
-
 			CreateMap<CompanyForCreationDTO, Company>();
 
+			CreateMap<CompanyForUpdateDTO, Company>();
+
+
+			// ---- EMPLOYEE ----
+
+			CreateMap<Employee, EmployeeDTO>();
+
 			CreateMap<EmployeeForCreationDTO, Employee>();
+
+			CreateMap<EmployeeForUpdateDTO, Employee>();
+
 		}
 
 	}

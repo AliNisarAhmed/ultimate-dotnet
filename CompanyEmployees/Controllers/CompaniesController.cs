@@ -134,5 +134,31 @@ namespace CompanyEmployees.Controllers
 			return NoContent();
 		}
 
+		[HttpPut("{id}")]
+		public IActionResult UpdateCompany(Guid id, [FromBody] CompanyForUpdateDTO company)
+		{
+			if (company == null)
+			{
+				_logger.LogError("CompanyForUpdateDto object sent from client is null.");
+				return BadRequest("CompanyForUpdateDto object is null");
+			}
+
+			var companyEntity = _repository.Company.GetCompany(id, trackChanges: true);
+
+			if (companyEntity == null)
+			{
+				_logger.LogInfo($"Company with id: {id} doesn't exist in the database.");
+				return NotFound();
+			}
+
+			// mapping to a tacked entity updates its fields, as well as add any Employees embedded within CompanyForUpdateDTO
+
+			_mapper.Map(company, companyEntity);
+
+			_repository.Save();
+
+			return NoContent();
+		}
+
 	}
 }
