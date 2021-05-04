@@ -84,6 +84,12 @@ namespace CompanyEmployees.Controllers
 				return BadRequest("CompanyForCreationDTO is null");
 			}
 
+			if (!ModelState.IsValid)
+			{
+				_logger.LogError("Invalid model state for the CompanyForCreationDTO object");
+				return UnprocessableEntity(ModelState);
+			}
+
 			var companyEntity = _mapper.Map<Company>(company);
 
 			_repository.Company.CreateCompany(companyEntity);
@@ -141,6 +147,12 @@ namespace CompanyEmployees.Controllers
 			{
 				_logger.LogError("CompanyForUpdateDto object sent from client is null.");
 				return BadRequest("CompanyForUpdateDto object is null");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				_logger.LogError("Invalid model state for the CompanyForUpdateDTO object");
+				return UnprocessableEntity(ModelState);
 			}
 
 			var companyEntity = _repository.Company.GetCompany(id, trackChanges: true);

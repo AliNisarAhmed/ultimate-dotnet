@@ -1,9 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Entities.DTO
 {
-	public class EmployeeForUpdateDTO
+	public class EmployeeForUpdateDTO : EmployeeForManipulationDTO
 	{
-		public string Name { get; set; }
-		public int Age { get; set; }
-		public string Postiion { get; set; }
+
 	}
 }

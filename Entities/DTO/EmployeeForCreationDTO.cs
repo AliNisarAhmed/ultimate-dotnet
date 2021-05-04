@@ -1,11 +1,10 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entities.DTO
 {
-	public class EmployeeForCreationDTO
+	public class EmployeeForCreationDTO : EmployeeForManipulationDTO
 	{
-		public string Name { get; set; }
-		public int Age { get; set; }
-		public string Position { get; set; }
+
 	}
 }

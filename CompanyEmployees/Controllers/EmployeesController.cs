@@ -78,6 +78,12 @@ namespace CompanyEmployees.Controllers
 				return BadRequest("EmployeeForCreationDTO object is null");
 			}
 
+			if (!ModelState.IsValid)
+			{
+				_logger.LogError("Invalid model state for the EmployeeForCreationDto object");
+				return UnprocessableEntity(ModelState);
+			}
+
 			var company = _repo.Company.GetCompany(companyId, trackChanges: false);
 
 			if (company == null)
@@ -129,6 +135,12 @@ namespace CompanyEmployees.Controllers
 				return BadRequest("EmployeeForUpdateDto object is null");
 			}
 
+			if (!ModelState.IsValid)
+			{
+				_logger.LogError("Invalid model for the EmployeeForUpdateDTO object");
+				return UnprocessableEntity(ModelState);
+			}
+
 			var company = _repo.Company.GetCompany(companyId, trackChanges: false);
 
 			if (company == null)
@@ -151,7 +163,6 @@ namespace CompanyEmployees.Controllers
 
 			return NoContent();
 		}
-
 
 		[HttpPatch("{id}")]
 		public IActionResult PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeForUpdateDTO> patchDoc)
@@ -178,7 +189,15 @@ namespace CompanyEmployees.Controllers
 
 			var employeeToPatch = _mapper.Map<EmployeeForUpdateDTO>(employeeEntity);
 
-			patchDoc.ApplyTo(employeeToPatch);
+			patchDoc.ApplyTo(employeeToPatch, ModelState);
+
+			TryValidateModel(employeeToPatch);
+
+			if (!ModelState.IsValid)
+			{
+				_logger.LogError("Invalid model state for the patch document");
+				return UnprocessableEntity(ModelState);
+			}
 
 			_mapper.Map(employeeToPatch, employeeEntity);
 
