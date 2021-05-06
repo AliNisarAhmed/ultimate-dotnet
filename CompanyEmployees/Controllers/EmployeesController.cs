@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using Contracts;
 using Entities.DTO;
@@ -26,9 +27,9 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult GetEmployeesForCompany(Guid companyId)
+		public async Task<IActionResult> GetEmployeesForCompany(Guid companyId)
 		{
-			var company = _repo.Company.GetCompany(companyId, trackChanges: false);
+			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
 			if (company == null)
 			{
 				_logger.LogInfo($"Company with id {companyId} does not exist in the database");
@@ -36,7 +37,7 @@ namespace CompanyEmployees.Controllers
 			}
 			else
 			{
-				var employeesFromDb = _repo.Employee.GetEmployees(companyId, trackChanges: false);
+				var employeesFromDb = await _repo.Employee.GetEmployeesAsync(companyId, trackChanges: false);
 
 				var employeeDto = _mapper.Map<IEnumerable<EmployeeDTO>>(employeesFromDb);
 
@@ -45,9 +46,9 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpGet("{id}", Name = "GetEmployeeForCompany")]
-		public IActionResult GetEmployeeForCompany(Guid companyId, Guid id)
+		public async Task<IActionResult> GetEmployeeForCompany(Guid companyId, Guid id)
 		{
-			var company = _repo.Company.GetCompany(companyId, trackChanges: false);
+			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
 			if (company == null)
 			{
 				_logger.LogInfo($"Company with id {companyId} does not exist in the database");
@@ -55,7 +56,7 @@ namespace CompanyEmployees.Controllers
 			}
 			else
 			{
-				var employeeDb = _repo.Employee.GetEmployee(companyId, id, trackChanges: false);
+				var employeeDb = await _repo.Employee.GetEmployeeAsync(companyId, id, trackChanges: false);
 
 				if (employeeDb == null)
 				{
@@ -70,7 +71,7 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDTO employee)
+		public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDTO employee)
 		{
 			if (employee == null)
 			{
@@ -84,7 +85,7 @@ namespace CompanyEmployees.Controllers
 				return UnprocessableEntity(ModelState);
 			}
 
-			var company = _repo.Company.GetCompany(companyId, trackChanges: false);
+			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
 
 			if (company == null)
 			{
@@ -95,7 +96,7 @@ namespace CompanyEmployees.Controllers
 			var employeeEntity = _mapper.Map<Employee>(employee);
 
 			_repo.Employee.CreateEmployeeForCompany(companyId, employeeEntity);
-			_repo.Save();
+			await _repo.SaveAsync();
 
 			var employeeToReturn = _mapper.Map<EmployeeDTO>(employeeEntity);
 
@@ -103,16 +104,16 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpDelete("{id}")]
-		public IActionResult DeleteEmployeeForCompany(Guid companyId, Guid id)
+		public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid id)
 		{
-			var company = _repo.Company.GetCompany(companyId, trackChanges: false);
+			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
 			if (company == null)
 			{
 				_logger.LogInfo($"Company with id: {companyId} does not exist in the database");
 				return NotFound();
 			}
 
-			var employeeForCompany = _repo.Employee.GetEmployee(companyId, id, trackChanges: false);
+			var employeeForCompany = await _repo.Employee.GetEmployeeAsync(companyId, id, trackChanges: false);
 
 			if (employeeForCompany == null)
 			{
@@ -121,13 +122,13 @@ namespace CompanyEmployees.Controllers
 			}
 
 			_repo.Employee.DeleteEmployee(employeeForCompany);
-			_repo.Save();
+			await _repo.SaveAsync();
 
 			return NoContent();
 		}
 
 		[HttpPut("{id}")]
-		public IActionResult UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeForUpdateDTO employee)
+		public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeForUpdateDTO employee)
 		{
 			if (employee == null)
 			{
@@ -141,7 +142,7 @@ namespace CompanyEmployees.Controllers
 				return UnprocessableEntity(ModelState);
 			}
 
-			var company = _repo.Company.GetCompany(companyId, trackChanges: false);
+			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
 
 			if (company == null)
 			{
@@ -149,7 +150,7 @@ namespace CompanyEmployees.Controllers
 				return NotFound();
 			}
 
-			var employeeEntity = _repo.Employee.GetEmployee(companyId, id, trackChanges: true);
+			var employeeEntity = await _repo.Employee.GetEmployeeAsync(companyId, id, trackChanges: true);
 
 			if (employeeEntity == null)
 			{
@@ -159,13 +160,13 @@ namespace CompanyEmployees.Controllers
 
 			_mapper.Map(employee, employeeEntity);
 
-			_repo.Save();
+			_repo.SaveAsync();
 
 			return NoContent();
 		}
 
 		[HttpPatch("{id}")]
-		public IActionResult PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeForUpdateDTO> patchDoc)
+		public async Task<IActionResult> PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeForUpdateDTO> patchDoc)
 		{
 			if (patchDoc == null)
 			{
@@ -173,14 +174,14 @@ namespace CompanyEmployees.Controllers
 				return BadRequest("patchDoc object is null");
 			}
 
-			var company = _repo.Company.GetCompany(companyId, trackChanges: false);
+			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
 			if (company == null)
 			{
 				_logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
 				return NotFound();
 			}
 
-			var employeeEntity = _repo.Employee.GetEmployee(companyId, id, trackChanges: true);
+			var employeeEntity = await _repo.Employee.GetEmployeeAsync(companyId, id, trackChanges: true);
 			if (employeeEntity == null)
 			{
 				_logger.LogInfo($"Employee with id: {id} doesn't exist in the database.");
@@ -201,7 +202,7 @@ namespace CompanyEmployees.Controllers
 
 			_mapper.Map(employeeToPatch, employeeEntity);
 
-			_repo.Save();
+			await _repo.SaveAsync();
 
 			return NoContent();
 		}
