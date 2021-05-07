@@ -17,6 +17,7 @@ using Microsoft.OpenApi.Models;
 using NLog;
 using AutoMapper;
 using LoggerService;
+using CompanyEmployees.ActionFilters;
 
 namespace CompanyEmployees
 {
@@ -39,6 +40,10 @@ namespace CompanyEmployees
 			services.ConfigureSqlContext(Configuration);
 			services.ConfigureRepositoryManager();
 			services.AddAutoMapper(typeof(Startup));
+
+			services.AddScoped<ValidationFilterAttribute>();
+			services.AddScoped<ValidateCompanyExistsAttribute>();
+			services.AddScoped<ValidateEmployeeForCompanyExistsAttribute>();
 
 			services.AddControllers(config =>
 			{

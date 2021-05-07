@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using CompanyEmployees.ActionFilters;
 using Contracts;
 using Entities.DTO;
 using Entities.Models;
@@ -71,20 +72,9 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpPost]
+		[ServiceFilter(typeof(ValidationFilterAttribute))]
 		public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDTO employee)
 		{
-			if (employee == null)
-			{
-				_logger.LogError("EmployeeForCreationDTO object sent from client is null");
-				return BadRequest("EmployeeForCreationDTO object is null");
-			}
-
-			if (!ModelState.IsValid)
-			{
-				_logger.LogError("Invalid model state for the EmployeeForCreationDto object");
-				return UnprocessableEntity(ModelState);
-			}
-
 			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
 
 			if (company == null)
@@ -104,16 +94,10 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpDelete("{id}")]
+		[ServiceFilter(typeof(ValidateEmployeeForCompanyExistsAttribute))]
 		public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid id)
 		{
-			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
-			if (company == null)
-			{
-				_logger.LogInfo($"Company with id: {companyId} does not exist in the database");
-				return NotFound();
-			}
-
-			var employeeForCompany = await _repo.Employee.GetEmployeeAsync(companyId, id, trackChanges: false);
+			var employeeForCompany = HttpContext.Items["employee"] as Employee;
 
 			if (employeeForCompany == null)
 			{
@@ -128,29 +112,11 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpPut("{id}")]
+		[ServiceFilter(typeof(ValidationFilterAttribute))]
+		[ServiceFilter(typeof(ValidateEmployeeForCompanyExistsAttribute))]
 		public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeForUpdateDTO employee)
 		{
-			if (employee == null)
-			{
-				_logger.LogError("EmployeeForUpdateDto object sent from client is null.");
-				return BadRequest("EmployeeForUpdateDto object is null");
-			}
-
-			if (!ModelState.IsValid)
-			{
-				_logger.LogError("Invalid model for the EmployeeForUpdateDTO object");
-				return UnprocessableEntity(ModelState);
-			}
-
-			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
-
-			if (company == null)
-			{
-				_logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
-				return NotFound();
-			}
-
-			var employeeEntity = await _repo.Employee.GetEmployeeAsync(companyId, id, trackChanges: true);
+			var employeeEntity = HttpContext.Items["employee"] as Employee;
 
 			if (employeeEntity == null)
 			{
@@ -160,7 +126,7 @@ namespace CompanyEmployees.Controllers
 
 			_mapper.Map(employee, employeeEntity);
 
-			_repo.SaveAsync();
+			await _repo.SaveAsync();
 
 			return NoContent();
 		}
@@ -174,14 +140,7 @@ namespace CompanyEmployees.Controllers
 				return BadRequest("patchDoc object is null");
 			}
 
-			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
-			if (company == null)
-			{
-				_logger.LogInfo($"Company with id: {companyId} doesn't exist in the database.");
-				return NotFound();
-			}
-
-			var employeeEntity = await _repo.Employee.GetEmployeeAsync(companyId, id, trackChanges: true);
+			var employeeEntity = HttpContext.Items["employee"] as Employee;
 			if (employeeEntity == null)
 			{
 				_logger.LogInfo($"Employee with id: {id} doesn't exist in the database.");

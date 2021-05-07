@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using CompanyEmployees.ActionFilters;
 using CompanyEmployees.ModelBinders;
 using Contracts;
 using Entities.DTO;
@@ -76,20 +77,9 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpPost]
+		[ServiceFilter(typeof(ValidationFilterAttribute))]
 		public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDTO company)
 		{
-			if (company == null)
-			{
-				_logger.LogError("CompanyForCreationDTO object sent from client is null");
-				return BadRequest("CompanyForCreationDTO is null");
-			}
-
-			if (!ModelState.IsValid)
-			{
-				_logger.LogError("Invalid model state for the CompanyForCreationDTO object");
-				return UnprocessableEntity(ModelState);
-			}
-
 			var companyEntity = _mapper.Map<Company>(company);
 
 			_repository.Company.CreateCompany(companyEntity);
@@ -127,7 +117,7 @@ namespace CompanyEmployees.Controllers
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteCompany(Guid id)
 		{
-			var company = await _repository.Company.GetCompanyAsync(id, trackChanges: false);
+			var company = HttpContext.Items["company"] as Company;
 			if (company == null)
 			{
 				_logger.LogInfo($"Company with id: {id} does not exist in the database");
@@ -141,21 +131,11 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpPut("{id}")]
+		[ServiceFilter(typeof(ValidationFilterAttribute))]
+		[ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
 		public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDTO company)
 		{
-			if (company == null)
-			{
-				_logger.LogError("CompanyForUpdateDto object sent from client is null.");
-				return BadRequest("CompanyForUpdateDto object is null");
-			}
-
-			if (!ModelState.IsValid)
-			{
-				_logger.LogError("Invalid model state for the CompanyForUpdateDTO object");
-				return UnprocessableEntity(ModelState);
-			}
-
-			var companyEntity = await _repository.Company.GetCompanyAsync(id, trackChanges: true);
+			var companyEntity = HttpContext.Items["company"] as Company;
 
 			if (companyEntity == null)
 			{
