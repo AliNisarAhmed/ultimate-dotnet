@@ -13,6 +13,6 @@ namespace Entities.DTO
 
 		[Required(ErrorMessage = "Position is a required field.")]
 		[MaxLength(20, ErrorMessage = "Maximum length for the Position is 20 characters.")]
-		public string Postiion { get; set; }
+		public string Position { get; set; }
 	}
 }

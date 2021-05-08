@@ -6,6 +6,7 @@ using CompanyEmployees.ActionFilters;
 using Contracts;
 using Entities.DTO;
 using Entities.Models;
+using Entities.RequestFeatures;
 using LoggerService;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,9 @@ namespace CompanyEmployees.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> GetEmployeesForCompany(Guid companyId)
+		public async Task<IActionResult> GetEmployeesForCompany(
+			Guid companyId,
+			[FromQuery] EmployeeParameters employeeParameters)
 		{
 			var company = await _repo.Company.GetCompanyAsync(companyId, trackChanges: false);
 			if (company == null)
@@ -38,7 +41,7 @@ namespace CompanyEmployees.Controllers
 			}
 			else
 			{
-				var employeesFromDb = await _repo.Employee.GetEmployeesAsync(companyId, trackChanges: false);
+				var employeesFromDb = await _repo.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
 
 				var employeeDto = _mapper.Map<IEnumerable<EmployeeDTO>>(employeesFromDb);
 
