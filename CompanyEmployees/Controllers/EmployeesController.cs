@@ -10,6 +10,7 @@ using Entities.RequestFeatures;
 using LoggerService;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace CompanyEmployees.Controllers
 {
@@ -42,6 +43,8 @@ namespace CompanyEmployees.Controllers
 			else
 			{
 				var employeesFromDb = await _repo.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
+
+				Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(employeesFromDb.MetaData));
 
 				var employeeDto = _mapper.Map<IEnumerable<EmployeeDTO>>(employeesFromDb);
 
