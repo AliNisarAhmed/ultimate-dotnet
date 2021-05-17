@@ -18,6 +18,9 @@ using NLog;
 using AutoMapper;
 using LoggerService;
 using CompanyEmployees.ActionFilters;
+using Repository.DataShaping;
+using Contracts;
+using Entities.DTO;
 
 namespace CompanyEmployees
 {
@@ -44,6 +47,8 @@ namespace CompanyEmployees
 			services.AddScoped<ValidationFilterAttribute>();
 			services.AddScoped<ValidateCompanyExistsAttribute>();
 			services.AddScoped<ValidateEmployeeForCompanyExistsAttribute>();
+
+			services.AddScoped<IDataShaper<EmployeeDTO>, DataShaper<EmployeeDTO>>();
 
 			services.AddControllers(config =>
 			{
