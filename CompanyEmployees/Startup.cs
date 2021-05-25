@@ -47,6 +47,7 @@ namespace CompanyEmployees
 			services.AddScoped<ValidationFilterAttribute>();
 			services.AddScoped<ValidateCompanyExistsAttribute>();
 			services.AddScoped<ValidateEmployeeForCompanyExistsAttribute>();
+			services.AddScoped<ValidateMediaTypeAttribute>();
 
 			services.AddScoped<IDataShaper<EmployeeDTO>, DataShaper<EmployeeDTO>>();
 
@@ -57,6 +58,8 @@ namespace CompanyEmployees
 			}).AddNewtonsoftJson()
 				.AddXmlDataContractSerializerFormatters()
 				.AddCustomCSVFormatter();
+
+			services.AddCustomMediaTypes();
 
 			services.AddSwaggerGen(c =>
 			{
