@@ -9,7 +9,7 @@ namespace Entities.LinkModels
 
 		}
 
-		public List<Link> Link { get; set; } = new List<Link>();
+		public List<Link> Links { get; set; } = new List<Link>();
 	}
 
 }
