@@ -61,6 +61,9 @@ namespace CompanyEmployees.Extensions
 					newtonsoftJsonOutputFormatter
 						.SupportedMediaTypes
 						.Add("application/vnd.codemaze.hateoas+json");
+					newtonsoftJsonOutputFormatter
+						.SupportedMediaTypes
+						.Add("application/vnd.codemaze.apiroot+json");
 				}
 
 				var xmlOutputFormatter =
@@ -71,6 +74,9 @@ namespace CompanyEmployees.Extensions
 					xmlOutputFormatter
 						.SupportedMediaTypes
 						.Add("application/vnd.codemaze.hateoas+xml");
+					xmlOutputFormatter
+						.SupportedMediaTypes
+						.Add("application/vnd.codemaze.apiroot+xml");
 				}
 
 			});
